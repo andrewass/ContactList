@@ -14,7 +14,7 @@
 <body>
     <form id="contactForm" runat="server">
         <div id="listdiv">
-            <h1>Contact List Page</h1>
+            <h1>Contact List</h1>
             <asp:Repeater ID="repeater" runat="server">
                 <HeaderTemplate>
                     <table cellspacing="0" rules="all" border="2">
@@ -40,7 +40,7 @@
         </div>
 
         <div id="searchdiv">
-            Search user by first and last name : <br />
+            Search contact by first and last name : <br />
             <asp:TextBox ID="searchPhrase" runat="server"></asp:TextBox> <br />
             <asp:Button ID="searchButton" runat="server" Text="Search" OnClick="searchButton_Click" />
         </div>

@@ -16,10 +16,24 @@ namespace ContactList {
         }
 
 
+        /* Create a new SqlCommand object based on a query string. 
+         * Parameter values are taken from the textboxes on the contact list page*/
+        private SqlCommand GetSqlCommand(string queryString) {
+            SqlCommand command = new SqlCommand(queryString, connection);
+            command.Parameters.AddWithValue("@firstname", firstName.Text);
+            command.Parameters.AddWithValue("@lastname", lastName.Text);
+            command.Parameters.AddWithValue("@phonenumber", phoneNumber.Text);
+            command.Parameters.AddWithValue("@email", email.Text);
+            return command;
+        }
+
+
+
         /* Filling the repeat controller with all the data stored in the Contacts table */
         private void FillList() {
-            SqlCommand command = new SqlCommand("select * from Contacts", connection);
             connection.Open();
+            string queryString = "select * from Contacts";
+            SqlCommand command = GetSqlCommand(queryString);
             SqlDataAdapter adapter = new SqlDataAdapter(command);
             DataSet dataset = new DataSet();
             adapter.Fill(dataset);
@@ -29,10 +43,11 @@ namespace ContactList {
         }
 
 
-        /* Search for a contact record based on first and last name */
+        /* Search for a contact record based on first and last name.
+         * If the contact record exists, the contact form is filled 
+         * with data from the contact record */
         protected void searchButton_Click(object sender, EventArgs e) {
-            SqlCommand command = new SqlCommand("select * from Contacts where Firstname = @firstname and Lastname = @lastname", connection);
-            connection.Open();
+            FillContactForm(searchPhrase.Text.Split(null));
         }
 
 
@@ -62,14 +77,32 @@ namespace ContactList {
         }
 
 
+        /* Fill the contact form with data from the corresponding record in the contact table */
+        private void FillContactForm(string[] fullName) {
+            connection.Open();
+            string queryString = "select * from Contacts where Firstname = @firstname and Lastname = @lastname";
+            SqlCommand command = new SqlCommand(queryString, connection);
+            command.Parameters.AddWithValue("@firstname", fullName[0]);
+            command.Parameters.AddWithValue("@lastname", fullName[1]);
+            SqlDataReader reader = command.ExecuteReader();
+            while(reader.Read()) {
+                firstName.Text = (string)reader["Firstname"];
+                lastName.Text = (string)reader["Lastname"];
+                phoneNumber.Text = (string)reader["Phonenumber"];
+                email.Text = (string)reader["Email"];
+            }
+            reader.Close();
+            connection.Close();
+        }
+
+
         /* Returns true or false, depending on the existence of a user record with the current data found
          * in the Textboxes */
         private bool RecordExists() {
             bool result = false;
             connection.Open();
-            SqlCommand command = new SqlCommand("select count(1) from Contacts where Firstname = @firstname and Lastname = @lastname", connection);
-            command.Parameters.AddWithValue("@firstname", firstName.Text);
-            command.Parameters.AddWithValue("@lastname", lastName.Text);
+            string queryString = "select count(1) from Contacts where Firstname = @firstname and Lastname = @lastname";
+            SqlCommand command = GetSqlCommand(queryString);
             SqlDataReader reader = command.ExecuteReader();
             while(reader.Read()) {
                 if((int)reader[0] == 1) {
@@ -85,12 +118,9 @@ namespace ContactList {
         /* Insert a new record into the contacts table */
         private void InsertRecord() {
             connection.Open();
-            SqlCommand command = new SqlCommand("insert into contacts (Firstname, Lastname, Phonenumber, Email) " +
-                "values (@firstname, @lastname, @phonenumber, @email)", connection);
-            command.Parameters.AddWithValue("@firstname", firstName.Text);
-            command.Parameters.AddWithValue("@lastname", lastName.Text);
-            command.Parameters.AddWithValue("@phonenumber", phoneNumber.Text);
-            command.Parameters.AddWithValue("@email", email.Text);
+            string queryString = "insert into contacts (Firstname, Lastname, Phonenumber, Email) " +
+                "values (@firstname, @lastname, @phonenumber, @email)";
+            SqlCommand command = GetSqlCommand(queryString);
             command.ExecuteNonQuery();
             connection.Close();
         }
@@ -99,13 +129,10 @@ namespace ContactList {
         /* Update phone number or mail adress for a record in the contacts table */
         private void UpdateRecord() {
             connection.Open();
-            SqlCommand command = new SqlCommand("update contacts " +
+            string queryString = "update contacts " +
                 "set Phonenumber = @phonenumber, Email = @email " +
-                "where Firstname = @firstname and Lastname = @lastname", connection);
-            command.Parameters.AddWithValue("@firstname", firstName.Text);
-            command.Parameters.AddWithValue("@lastname", lastName.Text);
-            command.Parameters.AddWithValue("@phonenumber", phoneNumber.Text);
-            command.Parameters.AddWithValue("@email", email.Text);
+                "where Firstname = @firstname and Lastname = @lastname";
+            SqlCommand command = GetSqlCommand(queryString);
             command.ExecuteNonQuery();
             connection.Close();
         }
@@ -114,9 +141,8 @@ namespace ContactList {
         /* Delete a record from the contacts table */
         private void DeleteRecord() {
             connection.Open();
-            SqlCommand command = new SqlCommand("delete from Contacts where Firstname = @firstname and Lastname = @lastname", connection);
-            command.Parameters.AddWithValue("@firstname", firstName.Text);
-            command.Parameters.AddWithValue("@lastname", lastName.Text);
+            string queryString = "delete from Contacts where Firstname = @firstname and Lastname = @lastname";
+            SqlCommand command = GetSqlCommand(queryString);
             command.ExecuteNonQuery();
             connection.Close();
         }
