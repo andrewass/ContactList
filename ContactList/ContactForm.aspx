@@ -7,15 +7,7 @@
     <title></title>
  
     <style type="text/css">
-        #contactdetails {
-            height: 235px;
-        }
-        #searchdiv {
-            height: 90px;
-        }
-        #listdiv {
-            height: 210px;
-        }
+      
     </style>
  
 </head>
@@ -64,7 +56,7 @@
             <asp:TextBox ID="email" runat="server"></asp:TextBox> <br />
             <asp:Button ID="saveButton" runat="server" Text="Save" OnClick="saveButton_Click" /> <br />
             <br />
-            <asp:Button ID="deleteButton" runat="server" Text="Delete" /> 
+            <asp:Button ID="deleteButton" runat="server" Text="Delete" OnClick="deleteButton_Click" /> 
         </div>
 
 
