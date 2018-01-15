@@ -7,11 +7,8 @@ namespace ContactList {
     public partial class LogInForm : Page {
 
         private string connectionString = "Server=localhost\\SQLEXPRESS;Database=Randombase;Trusted_Connection=True";
-        private SqlConnection connection;
 
-        protected void Page_Load(object sender, EventArgs e) {
-            connection = new SqlConnection(connectionString);
-        }
+        protected void Page_Load(object sender, EventArgs e) {}
 
 
         /* Redirect to the contact list page if the username and password combination
@@ -20,7 +17,6 @@ namespace ContactList {
             if(CorrectLogIn(username.Text, password.Text)) {
                 Response.Redirect("ContactForm.aspx");
             }
-            else {}
         }
 
 
@@ -28,20 +24,16 @@ namespace ContactList {
          * else false is returned */
         private bool CorrectLogIn(string username, string password) {
             bool result = false;
-            connection.Open();
-            SqlCommand command = new SqlCommand("select count(1) from Users where Username = @username and password = @password", connection);
-            command.Parameters.AddWithValue("@username", username);
-            command.Parameters.AddWithValue("@password", password);
-            SqlDataReader reader = command.ExecuteReader();
-            while(reader.Read()) {
-                if((int)reader[0] == 1) {
-                    result = true;
-                }
+            using(SqlConnection connection = new SqlConnection(connectionString)) {
+                connection.Open();
+                string queryString = "select count(1) from Users where Username = @username and password = @password";
+                SqlCommand command = new SqlCommand(queryString, connection);
+                command.Parameters.AddWithValue("@username", username);
+                command.Parameters.AddWithValue("@password", password);
+                int count = (int)command.ExecuteScalar();
+                result = (count == 1) ? true : false;
             }
-            reader.Close();
-            connection.Close();
             return result;
         }
-
     }
 }
