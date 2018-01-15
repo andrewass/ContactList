@@ -78,6 +78,7 @@
     <Content Include="ContactForm.aspx" />
     <Content Include="Global.asax" />
     <Content Include="LogInForm.aspx" />
+    <Content Include="ui_operations.js" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

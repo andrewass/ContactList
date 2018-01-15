@@ -4,12 +4,8 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title></title>
- 
-    <style type="text/css">
-      
-    </style>
- 
+    <title>Contact Form</title>
+    <script src="ui_operations.js"> </script>
 </head>
 <body>
     <form id="contactForm" runat="server">
@@ -56,7 +52,8 @@
             <asp:TextBox ID="email" runat="server"></asp:TextBox> <br />
             <asp:Button ID="saveButton" runat="server" Text="Save" OnClick="saveButton_Click" /> <br />
             <br />
-            <asp:Button ID="deleteButton" runat="server" Text="Delete" OnClick="deleteButton_Click" /> 
+            <asp:Button ID="deleteButton" runat="server" Text="Delete" OnClick="deleteButton_Click" 
+                OnClientClick="ConfirmDelete()" /> 
         </div>
 
 

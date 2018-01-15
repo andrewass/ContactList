@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Text.RegularExpressions;
 using System.Web.UI;
 
 namespace ContactList {
@@ -26,7 +27,6 @@ namespace ContactList {
         }
 
 
-
         /* Fill the fieldvalues array with current values from the textboxes */
         private void SetFieldValues() {
             fieldvalues[0] = firstName.Text;
@@ -34,7 +34,6 @@ namespace ContactList {
             fieldvalues[2] = phoneNumber.Text;
             fieldvalues[3] = email.Text;
         }
-
 
 
         /* Filling the repeat controller with all the data stored in the Contacts table */
@@ -52,7 +51,6 @@ namespace ContactList {
         }
 
 
-
         /* Search for a contact record based on first and last name.
          * If the contact record exists, the contact form is filled 
          * with data from the contact record */
@@ -61,10 +59,30 @@ namespace ContactList {
         }
 
 
+        /* If record of a contact is found, delete it from the Contacts table, 
+         * else notify user that no such record is stored */
+        protected void deleteButton_Click(object sender, EventArgs e) {
+            string confirmedDelete = Request.Form["confirmedDelete"];
+            bool foundRecord = RecordExists();
+            if(foundRecord && confirmedDelete.Equals("yes")){
+                ModifyTable(deleteQuery);
+                FillList();
+            }
+            if(!foundRecord) { 
+                Response.Write("<script>alert('Unable to delete contact. Record not found')</script>");
+            }
+        }
 
-        /* Save the user data to the database. If the user already exists,
-         * update the record, else insert as a new user record */
+
+        /* Prior to any database modification, verify that the e-mail 
+        * and phone number is in a valid format. If valid, save the 
+        * user data to the database. If the user already exists,
+        * update the record, else insert as a new user record */
         protected void saveButton_Click(object sender, EventArgs e) {
+            if(!IsValidEmail(email.Text) || !IsValidPhoneNumber(phoneNumber.Text)) {
+                Response.Write("<script>alert('Invalid input data!')</script>");
+                return;
+            }
             if(RecordExists()) {
                 ModifyTable(updateQuery);
             }
@@ -73,21 +91,6 @@ namespace ContactList {
             }
             FillList();
         }
-
-
-
-        /* If record of a contact is found, delete it from the Contacts table, 
-         * else notify user that no such record is stored */
-        protected void deleteButton_Click(object sender, EventArgs e) {
-            if(RecordExists()) {
-                ModifyTable(deleteQuery);
-                FillList();
-            }
-            else {
-                Response.Write("<script>alert('Unable to delete contact. Record not found')</script>");
-            }
-        }
-
 
 
         /* Fill the contact form with data from the corresponding record in the contact table */
@@ -110,7 +113,6 @@ namespace ContactList {
         }
 
 
-
         /* Returns true or false, depending on the existence of a user record with the current data found
          * in the Textboxes */
         private bool RecordExists() {
@@ -128,7 +130,6 @@ namespace ContactList {
         }
 
 
-
         /* Perform either an update, insert or delete operation on the contacts table, depending
          * on the queryString argument */
         private void ModifyTable(string queryString) {
@@ -141,6 +142,39 @@ namespace ContactList {
                 }
                 command.ExecuteNonQuery();
             }
+        }
+
+
+        /* Verify if a string representing an e-mail address is in a valid form. 
+         * Source : Microsoft Developer Network documentation */
+        private bool IsValidEmail(string email) {
+            return Regex.IsMatch(email,
+                    @"^(?("")(""[^""]+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-zA-Z])@))" +
+                    @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,6}))$");
+        }
+
+
+        /* Verify if a string representing a phone number is in a valid form. 
+         * Allowing a prefix of '+' for country codes. */
+        private bool IsValidPhoneNumber(string phoneNumber) {
+            int startIndex;
+            if(phoneNumber[0] == '+') {
+                startIndex = 1;
+            }
+            else {
+                startIndex = 0;
+            }
+            //Setting minimum limit of 3 digits
+            if(phoneNumber.Length-startIndex < 3) {
+                return false;
+            }
+            //Verify that each remaining character represents a digit
+            for(int i=startIndex; i<phoneNumber.Length; i++) {
+                if(!Char.IsDigit(phoneNumber[i])) {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }
