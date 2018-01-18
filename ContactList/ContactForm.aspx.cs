@@ -24,6 +24,7 @@ namespace ContactList {
         protected void Page_Load(object sender, EventArgs e) {
             fieldvalues = new string[fieldCount];
             FillList();
+            
         }
 
 
@@ -45,8 +46,8 @@ namespace ContactList {
                 SqlDataAdapter adapter = new SqlDataAdapter(command);
                 DataSet dataset = new DataSet();
                 adapter.Fill(dataset);
-                repeater.DataSource = dataset;
-                repeater.DataBind();
+                listview.DataSource = dataset;
+                listview.DataBind();
             }
         }
 
@@ -55,7 +56,10 @@ namespace ContactList {
          * If the contact record exists, the contact form is filled 
          * with data from the contact record */
         protected void searchButton_Click(object sender, EventArgs e) {
-            FillContactForm(searchPhrase.Text.Split(null));
+            string[] fullName = searchPhrase.Text.Split(null);
+            if(fullName.Length == 2) {
+                FillContactForm(fullName);
+            }
         }
 
 
@@ -146,8 +150,11 @@ namespace ContactList {
 
 
         /* Verify if a string representing an e-mail address is in a valid form. 
-         * Source : Microsoft Developer Network documentation */
+         * Regex Source : Microsoft Developer Network documentation */
         private bool IsValidEmail(string email) {
+            if(email.Length == 0) {
+                return true;
+            }
             return Regex.IsMatch(email,
                     @"^(?("")(""[^""]+?""@)|(([0-9a-zA-Z]((\.(?!\.))|[-!#\$%&'\*\+/=\?\^`\{\}\|~\w])*)(?<=[0-9a-zA-Z])@))" +
                     @"(?(\[)(\[(\d{1,3}\.){3}\d{1,3}\])|(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]\.)+[a-zA-Z]{2,6}))$");
@@ -157,13 +164,11 @@ namespace ContactList {
         /* Verify if a string representing a phone number is in a valid form. 
          * Allowing a prefix of '+' for country codes. */
         private bool IsValidPhoneNumber(string phoneNumber) {
+            if(phoneNumber.Length == 0) {
+                return true;
+            }
             int startIndex;
-            if(phoneNumber[0] == '+') {
-                startIndex = 1;
-            }
-            else {
-                startIndex = 0;
-            }
+            startIndex = (phoneNumber[0] == '+') ? 1 : 0;
             //Setting minimum limit of 3 digits
             if(phoneNumber.Length-startIndex < 3) {
                 return false;

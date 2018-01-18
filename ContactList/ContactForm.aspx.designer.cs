@@ -22,13 +22,13 @@ namespace ContactList {
         protected global::System.Web.UI.HtmlControls.HtmlForm contactForm;
         
         /// <summary>
-        /// repeater control.
+        /// listview control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Repeater repeater;
+        protected global::System.Web.UI.WebControls.ListView listview;
         
         /// <summary>
         /// searchPhrase control.

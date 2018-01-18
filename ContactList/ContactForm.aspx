@@ -11,16 +11,23 @@
     <form id="contactForm" runat="server">
         <div id="listdiv">
             <h1>Contact List</h1>
-            <asp:Repeater ID="repeater" runat="server">
-                <HeaderTemplate>
+            
+            <asp:ListView ID="listview" runat="server">
+                <LayoutTemplate>
                     <table cellspacing="0" rules="all" border="2">
-                    <tr>
-                        <th scope="col" style="width: 150px"> First Name </th>
-                        <th scope="col" style="width: 150px"> Last Name </th>
-                        <th scope="col" style="width: 150px"> Phone Number </th>
-                        <th scope="col" style="width: 200px"> E-mail </th>
-                    </tr>
-                </HeaderTemplate>
+                        <thead>
+                            <tr>
+                                <th  style="width: 150px"> First Name </th>
+                                <th  style="width: 150px"> Last Name </th>
+                                <th  style="width: 150px"> Phone Number </th>
+                                <th  style="width: 200px"> E-mail </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <asp:PlaceHolder ID="itemPlaceholder" runat="server"></asp:PlaceHolder>
+                        </tbody>
+                    </table>
+                </LayoutTemplate>
                 <ItemTemplate>
                      <tr>
                         <td> <%# Eval("Firstname") %> </td>
@@ -29,10 +36,7 @@
                         <td> <%# Eval("Email") %> </td>
                     </tr>
                 </ItemTemplate>
-                <FooterTemplate>
-                    </table>
-                </FooterTemplate>
-            </asp:Repeater> 
+            </asp:ListView>
         </div>
 
         <div id="searchdiv">
